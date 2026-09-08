@@ -19,7 +19,14 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"],
+      "@components": ["./src/app/components"],
+      "@features/*": ["./src/features/*"],
+      "@layouts": ["./src/layouts"],
+      "@icons": ["./src/icons"],
+      "@store": ["./src/store/store.ts"],
+      "@axios": ["./src/service/axios/axiosInstance.ts"],
+      "@locale/*": ["./src/locale/en.json"]
     }
   },
   "include": [
