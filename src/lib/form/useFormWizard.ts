@@ -5,32 +5,38 @@ interface UseFormWizardProps<T extends FieldValues> {
   totalSteps: number;
   stepFields: Path<T>[][];
   trigger: UseFormTrigger<T>;
+  skipStep?: (stepIndex: number) => boolean; // NEW: return true to skip a given step
 }
 
 function useFormWizard<T extends FieldValues>({
   totalSteps,
   stepFields,
   trigger,
+  skipStep,
 }: UseFormWizardProps<T>) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const next = async () => {
-    const fieldsForCurrentStep = stepFields[currentStep];
-    const isValid = await trigger(fieldsForCurrentStep);
+    const isValid = await trigger(stepFields[currentStep]);
+    if (!isValid) return;
 
-    if (isValid && currentStep < totalSteps - 1) {
-      setCurrentStep((step) => step + 1);
+    let nextIndex = currentStep + 1;
+    while (nextIndex < totalSteps && skipStep?.(nextIndex)) {
+      nextIndex++;
     }
+    if (nextIndex < totalSteps) setCurrentStep(nextIndex);
   };
 
   const back = () => {
-    setCurrentStep((step) => Math.max(0, step - 1));
+    let prevIndex = currentStep - 1;
+    while (prevIndex >= 0 && skipStep?.(prevIndex)) {
+      prevIndex--;
+    }
+    setCurrentStep(Math.max(0, prevIndex));
   };
 
   const goToStep = (index: number) => {
-    if (index >= 0 && index < totalSteps) {
-      setCurrentStep(index);
-    }
+    if (index >= 0 && index < totalSteps) setCurrentStep(index);
   };
 
   return {
