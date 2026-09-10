@@ -37,8 +37,9 @@ function DebtsTemplate(
             options={debtTypeOptions}
             placeholder="Select type"
             value={item.type}
-            onChange={(e) => updateItem({ ...item, type: e.target.value })}
+            onChange={(value) => updateItem({ ...item, type: value })}
           />
+
           <Input
             label="Monthly payment (AED)"
             type="number"

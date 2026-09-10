@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import Select from '@/components/ui/select/select';
 import Input from '@/components/ui/input/Input';
-import { PersonalInfoValues } from '@/lib/validations/personalInfoSchema';
+import { MortgageFormValues } from '@/lib/validations/mortgageFormSchema';
 import DatePicker from '@/components/ui/date-picker/DatePicker';
 import RadioGroup from '@/components/ui/radio-group/RadioGroup';
 
@@ -17,7 +17,7 @@ function PersonalInfoPage() {
     register,
     control,
     formState: { errors },
-  } = useFormContext<PersonalInfoValues>();
+  } = useFormContext<MortgageFormValues>();
 
   return (
     <div className="flex flex-col gap-4">
@@ -62,13 +62,20 @@ function PersonalInfoPage() {
         {...register('dateOfBirth')}
       />
 
-      <Select
-        label="Nationality"
-        options={nationalityOptions}
-        placeholder="Select nationality"
-        required
-        error={errors.nationality?.message}
-        {...register('nationality')}
+      <Controller
+        name="nationality"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Select
+            label="Nationality"
+            options={nationalityOptions}
+            placeholder="Select nationality"
+            required
+            value={field.value ?? ''}
+            onChange={field.onChange}
+            error={fieldState.error?.message}
+          />
+        )}
       />
 
       <Input

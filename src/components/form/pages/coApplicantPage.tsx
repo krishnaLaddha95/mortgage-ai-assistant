@@ -1,13 +1,12 @@
 import Input from '@/components/ui/input/Input';
 import Select from '@/components/ui/select/select';
 import { CoApplicantValues } from '@/lib/validations/coApplicantSchema';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 function CoApplicantPage() {
   const {
     register,
     control,
-    watch,
     formState: { errors },
   } = useFormContext<CoApplicantValues>();
 
@@ -33,12 +32,21 @@ function CoApplicantPage() {
         error={errors.coApplicantEmail?.message}
         {...register('coApplicantEmail')}
       />
-      <Select
-        label="Relationship to Primary Applicant"
-        options={relationshipOptions}
-        required
-        error={errors.relationshipToPrimary?.message}
-        {...register('relationshipToPrimary')}
+
+      <Controller
+        name="relationshipToPrimary"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Select
+            label="Relationship to Primary Applicant"
+            options={relationshipOptions}
+            placeholder="Select nationality"
+            required
+            value={field.value ?? ''}
+            onChange={field.onChange}
+            error={fieldState.error?.message}
+          />
+        )}
       />
     </div>
   );

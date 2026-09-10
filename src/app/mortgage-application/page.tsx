@@ -1,10 +1,7 @@
 'use client';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  personalInfoSchema,
-  PersonalInfoValues,
-} from '@/lib/validations/personalInfoSchema';
+import { PersonalInfoValues } from '@/lib/validations/personalInfoSchema';
 import useFormWizard from '@/lib/form/useFormWizard';
 import Stepper from '@/components/form/stepper/Stepper';
 import Button from '@/components/ui/button/button';
@@ -15,7 +12,7 @@ import {
   mortgageFormSchema,
   MortgageFormValues,
 } from '@/lib/validations/mortgageFormSchema';
-import PropertyDetails from '@/components/form/pages/propertyDetails';
+import PropertyDetailsPage from '@/components/form/pages/propertyDetailsPage';
 
 export default function MortgageApplicationPage() {
   const methods = useForm<MortgageFormValues>({
@@ -85,7 +82,7 @@ export default function MortgageApplicationPage() {
             {currentStep === 0 && <PersonalInfoPage />}
             {currentStep === 1 && <EmploymentPage />}
             {currentStep === 2 && <CoApplicantPage />}
-            {currentStep === 3 && <PropertyDetails />}
+            {currentStep === 3 && <PropertyDetailsPage />}
           </div>
 
           <div className="flex gap-3 mt-8">
