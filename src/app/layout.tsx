@@ -13,7 +13,11 @@ const plexSans = IBM_Plex_Sans({
   weight: ['400', '500', '600'],
 });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${fraunces.variable} ${plexSans.variable}`}>
       <body>{children}</body>

@@ -1,28 +1,28 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --color-ink: #1B2430;
-  --color-paper: #F3F4F1;
+  --color-ink: #1b2430;
+  --color-paper: #f3f4f1;
 
-  --color-brand-50: #EDEFF1;
-  --color-brand-100: #D4D9DE;
-  --color-brand-500: #4E5D6E;
-  --color-brand-600: #3E4C5E;
-  --color-brand-700: #2E3A48;
+  --color-brand-50: #edeff1;
+  --color-brand-100: #d4d9de;
+  --color-brand-500: #4e5d6e;
+  --color-brand-600: #3e4c5e;
+  --color-brand-700: #2e3a48;
 
-  --color-accent-500: #C79A4F;
-  --color-accent-600: #B8863B;
-  --color-accent-700: #96702F;
+  --color-accent-500: #c79a4f;
+  --color-accent-600: #b8863b;
+  --color-accent-700: #96702f;
 
-  --color-error-500: #C15A3F;
-  --color-error-600: #A8462F;
+  --color-error-500: #c15a3f;
+  --color-error-600: #a8462f;
 
-  --color-neutral-50: #F8F8F6;
-  --color-neutral-100: #EFEFEC;
-  --color-neutral-300: #D3D4D0;
-  --color-neutral-500: #8A8D8A;
-  --color-neutral-700: #4A4D4B;
-  --color-neutral-900: #1B2430;
+  --color-neutral-50: #f8f8f6;
+  --color-neutral-100: #efefec;
+  --color-neutral-300: #d3d4d0;
+  --color-neutral-500: #8a8d8a;
+  --color-neutral-700: #4a4d4b;
+  --color-neutral-900: #1b2430;
 
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-plex), system-ui, sans-serif;
