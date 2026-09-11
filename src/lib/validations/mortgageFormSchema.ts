@@ -28,10 +28,34 @@ const employmentInfoSchema = z.object({
     .refine(isNotFutureDate, 'Employment start date cannot be a future date'),
 });
 
+const debtSchema = z.object({
+  type: z.string().min(1, 'Debt type is required'),
+  monthlyPayment: z
+    .string()
+    .min(1, 'Monthly payment is required')
+    .refine(
+      (val) => Number(val) > 0,
+      'Monthly payment must be a positive number'
+    ),
+});
+
+const debtsSchema = z.object({
+  debts: z.array(debtSchema).optional(),
+});
+
+const documentsSchema = z.object({
+  idProof: z.array(z.any()).optional(),
+  salaryOrTradeLicence: z.array(z.any()).optional(),
+  bankStatements: z.array(z.any()).optional(),
+  propertyDocuments: z.array(z.any()).optional(),
+});
+
 export const mortgageFormSchema = personalInfoSchema
   .extend(employmentInfoSchema.shape)
   .extend(coApplicantSchema.shape)
   .extend(propertySchema.shape)
+  .extend(debtsSchema.shape)
+  .extend(documentsSchema.shape)
   .superRefine((data, ctx) => {
     if (data.employmentStatus === 'employed') {
       if (!data.employerName)

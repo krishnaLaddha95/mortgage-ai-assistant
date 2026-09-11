@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select } from './select';
+import { useState } from 'react';
+import Select from './select';
 
 const nationalityOptions = [
   { value: 'ae', label: 'United Arab Emirates' },
@@ -24,24 +25,33 @@ const meta: Meta<typeof Select> = {
 export default meta;
 type Story = StoryObj<typeof Select>;
 
+// Controlled wrapper — Select takes value/onChange, not defaultValue,
+// so stories need local state to actually be interactive
+function Template(args: Partial<React.ComponentProps<typeof Select>>) {
+  const [value, setValue] = useState(args.value ?? '');
+  return (
+    <Select
+      label="Nationality"
+      options={nationalityOptions}
+      placeholder="Select nationality"
+      {...args}
+      value={value}
+      onChange={setValue}
+    />
+  );
+}
+
 export const Default: Story = {
-  args: {
-    label: 'Nationality',
-    options: nationalityOptions,
-    placeholder: 'Select nationality',
-  },
+  render: (args) => <Template {...args} />,
 };
 
 export const Large: Story = {
-  args: {
-    label: 'Nationality',
-    options: nationalityOptions,
-    placeholder: 'Select nationality',
-    size: 'lg',
-  },
+  render: (args) => <Template {...args} />,
+  args: { size: 'lg' },
 };
 
 export const Required: Story = {
+  render: (args) => <Template {...args} />,
   args: {
     label: 'Employment status',
     options: [
@@ -54,15 +64,12 @@ export const Required: Story = {
 };
 
 export const WithError: Story = {
-  args: {
-    label: 'Nationality',
-    options: nationalityOptions,
-    placeholder: 'Select nationality',
-    error: 'Please select your nationality',
-  },
+  render: (args) => <Template {...args} />,
+  args: { error: 'Please select your nationality' },
 };
 
 export const WithHelperText: Story = {
+  render: (args) => <Template {...args} />,
   args: {
     label: 'Property type',
     options: [
@@ -76,20 +83,12 @@ export const WithHelperText: Story = {
 };
 
 export const Disabled: Story = {
-  args: {
-    label: 'Nationality',
-    options: nationalityOptions,
-    defaultValue: 'in',
-    disabled: true,
-  },
+  render: (args) => <Template {...args} />,
+  args: { value: 'in', disabled: true },
 };
 
 export const Block: Story = {
-  args: {
-    label: 'Nationality',
-    options: nationalityOptions,
-    placeholder: 'Select nationality',
-    block: true,
-  },
+  render: (args) => <Template {...args} />,
+  args: { block: true },
   parameters: { layout: 'padded' },
 };

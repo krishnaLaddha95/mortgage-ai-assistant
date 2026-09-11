@@ -1,97 +1,100 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import '@testing-library/jest-dom';
-import { Select } from './select';
+import Select from './select';
 
 const options = [
   { value: 'in', label: 'India' },
   { value: 'ae', label: 'United Arab Emirates' },
 ];
 
-test('renders label linked to select', () => {
-  render(<Select label="Nationality" options={options} />);
-  expect(screen.getByLabelText('Nationality')).toBeInTheDocument();
-});
-
-test('renders all provided options', () => {
-  render(<Select label="Nationality" options={options} />);
-  expect(screen.getByRole('option', { name: 'India' })).toBeInTheDocument();
-  expect(
-    screen.getByRole('option', { name: 'United Arab Emirates' })
-  ).toBeInTheDocument();
-});
-
-test('renders placeholder as a disabled first option', () => {
-  render(
+// Controlled wrapper — Select takes value/onChange, not defaultValue,
+// same pattern used for RadioGroup and RepeatableFieldList tests
+function ControlledSelect(props: Partial<React.ComponentProps<typeof Select>>) {
+  const [value, setValue] = useState(props.value ?? '');
+  return (
     <Select
       label="Nationality"
       options={options}
       placeholder="Select nationality"
+      {...props}
+      value={value}
+      onChange={setValue}
     />
   );
-  const placeholderOption = screen.getByRole('option', {
-    name: 'Select nationality',
+}
+
+test('renders the label and placeholder when nothing is selected', () => {
+  render(<ControlledSelect />);
+  expect(screen.getByText('Nationality')).toBeInTheDocument();
+  expect(screen.getByText('Select nationality')).toBeInTheDocument();
+});
+
+test('opens the dropdown when the trigger is clicked', async () => {
+  render(<ControlledSelect />);
+  const trigger = screen.getByRole('button');
+  await userEvent.click(trigger);
+  expect(screen.getByRole('listbox')).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'India' })).toBeInTheDocument();
+});
+
+test('selects an option when clicked and closes the dropdown', async () => {
+  render(<ControlledSelect />);
+  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByRole('option', { name: 'India' }));
+
+  expect(screen.getByRole('button')).toHaveTextContent('India');
+  expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+});
+
+test('shows the selected option as checked via aria-selected', async () => {
+  render(<ControlledSelect value="ae" />);
+  await userEvent.click(screen.getByRole('button'));
+  const selectedOption = screen.getByRole('option', {
+    name: 'United Arab Emirates',
   });
-  expect(placeholderOption).toBeDisabled();
+  expect(selectedOption).toHaveAttribute('aria-selected', 'true');
 });
 
-test('allows selecting an option', async () => {
-  render(<Select label="Nationality" options={options} />);
-  const select = screen.getByLabelText('Nationality');
-  await userEvent.selectOptions(select, 'ae');
-  expect(select).toHaveValue('ae');
-});
-
-test('shows required asterisk and sets aria-required', () => {
-  render(<Select label="Employment status" options={options} required />);
-  expect(screen.getByText('*')).toBeInTheDocument();
-  expect(screen.getByLabelText(/Employment status/)).toHaveAttribute(
-    'aria-required',
-    'true'
-  );
-});
-
-test('shows error message and sets aria-invalid', () => {
+test('closes the dropdown when clicking outside', async () => {
   render(
-    <Select
-      label="Nationality"
-      options={options}
-      error="Please select a nationality"
-    />
+    <div>
+      <ControlledSelect />
+      <button>Outside button</button>
+    </div>
   );
-  const select = screen.getByLabelText('Nationality');
+  const [selectTrigger] = screen.getAllByRole('button');
+  await userEvent.click(selectTrigger);
+  expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: 'Outside button' }));
+  expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+});
+
+test('does not open when disabled', async () => {
+  render(<ControlledSelect disabled />);
+  const trigger = screen.getByRole('button');
+  expect(trigger).toBeDisabled();
+  await userEvent.click(trigger);
+  expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+});
+
+test('shows required asterisk', () => {
+  render(<ControlledSelect required />);
+  expect(screen.getByText('*')).toBeInTheDocument();
+});
+
+test('shows error message when provided', () => {
+  render(<ControlledSelect error="Please select your nationality" />);
   expect(screen.getByRole('alert')).toHaveTextContent(
-    'Please select a nationality'
+    'Please select your nationality'
   );
-  expect(select).toHaveAttribute('aria-invalid', 'true');
 });
 
 test('shows helper text when there is no error', () => {
-  render(
-    <Select
-      label="Property type"
-      options={options}
-      helperText="Affects required documents"
-    />
-  );
-  expect(screen.getByText('Affects required documents')).toBeInTheDocument();
-});
-
-test('is disabled and does not allow selection changes', () => {
-  render(
-    <Select label="Nationality" options={options} defaultValue="in" disabled />
-  );
-  expect(screen.getByLabelText('Nationality')).toBeDisabled();
-});
-
-test('renders full width when block is true', () => {
-  const { container } = render(
-    <Select label="Nationality" options={options} block />
-  );
-  expect(container.firstChild).toHaveClass('w-full');
-});
-
-test.each(['md', 'lg'] as const)('renders %s size without crashing', (size) => {
-  render(<Select label="Nationality" options={options} size={size} />);
-  expect(screen.getByLabelText('Nationality')).toBeInTheDocument();
+  render(<ControlledSelect helperText="This affects required documents" />);
+  expect(
+    screen.getByText('This affects required documents')
+  ).toBeInTheDocument();
 });

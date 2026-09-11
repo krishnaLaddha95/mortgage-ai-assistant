@@ -38,6 +38,11 @@ function FileUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [sizeError, setSizeError] = useState<string | null>(null);
 
+  // For single-file fields, once a file exists, the dropzone hides in favor
+  // of the file row + a "Replace" action. Multi-file fields always keep the
+  // dropzone visible, since adding more is an expected, repeated action.
+  const showDropzone = multiple || value.length === 0;
+
   const validateAndSetFiles = useCallback(
     (fileList: FileList) => {
       const files = Array.from(fileList);
@@ -63,6 +68,10 @@ function FileUpload({
     onChange?.(value.filter((_, i) => i !== index));
   };
 
+  const openFileDialog = () => {
+    if (!disabled) inputRef.current?.click();
+  };
+
   const displayError = error || sizeError;
 
   return (
@@ -76,76 +85,88 @@ function FileUpload({
         )}
       </label>
 
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          if (!disabled) setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => !disabled && inputRef.current?.click()}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+      {/* Hidden native input always exists regardless of dropzone visibility,
+          since "Replace" still needs to trigger the same file dialog */}
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="file"
+        accept={accept}
+        multiple={multiple}
+        disabled={disabled}
+        onChange={(e) => e.target.files && validateAndSetFiles(e.target.files)}
+        className="sr-only"
+      />
+
+      {showDropzone && (
+        <div
+          onDragOver={(e) => {
             e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
-        className={`
-          rounded-md border-2 border-dashed px-4 py-6 text-center cursor-pointer transition-colors
-          ${isDragging ? 'border-brand-500 bg-brand-50' : 'border-neutral-300'}
-          ${displayError ? 'border-error-500' : ''}
-          ${disabled ? 'opacity-50 cursor-not-allowed bg-neutral-50' : 'hover:border-brand-400'}
-        `}
-        aria-invalid={!!displayError}
-        aria-describedby={
-          displayError ? errorId : helperText ? helperId : undefined
-        }
-      >
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="file"
-          accept={accept}
-          multiple={multiple}
-          disabled={disabled}
-          onChange={(e) =>
-            e.target.files && validateAndSetFiles(e.target.files)
-          }
-          className="sr-only"
-        />
-        <p className="text-sm text-neutral-600">
-          <span className="text-brand-600 font-medium">Click to upload</span> or
-          drag and drop
-        </p>
-        <p className="text-xs text-neutral-500 mt-1">
-          {accept.replaceAll('.', '').toUpperCase()} up to {maxSizeMB}MB
-        </p>
-      </div>
+            if (!disabled) setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={openFileDialog}
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          onKeyDown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+              e.preventDefault();
+              openFileDialog();
+            }
+          }}
+          className={`
+            rounded-md border-2 border-dashed px-4 py-6 text-center cursor-pointer transition-colors
+            ${isDragging ? 'border-brand-500 bg-brand-50' : 'border-neutral-300'}
+            ${displayError ? 'border-error-500' : ''}
+            ${disabled ? 'opacity-50 cursor-not-allowed bg-neutral-50' : 'hover:border-brand-400'}
+          `}
+          aria-invalid={!!displayError}
+          aria-describedby={displayError ? errorId : helperText ? helperId : undefined}
+        >
+          <p className="text-sm text-neutral-600">
+            <span className="text-brand-600 font-medium">Click to upload</span> or drag and drop
+          </p>
+          <p className="text-xs text-neutral-500 mt-1">
+            {accept.replaceAll('.', '').toUpperCase()} up to {maxSizeMB}MB
+          </p>
+        </div>
+      )}
 
       {value.length > 0 && (
         <ul className="flex flex-col gap-1 mt-1">
           {value.map((file, index) => (
             <li
               key={`${file.name}-${index}`}
-              className="flex items-center justify-between text-sm bg-neutral-50 rounded-md px-3 py-2"
+              className="flex items-center justify-between text-sm bg-neutral-50 rounded-md px-3 py-2 border border-neutral-300"
             >
               <span className="truncate">
-                {file.name}{' '}
-                <span className="text-neutral-500">
-                  ({formatFileSize(file.size)})
-                </span>
+                {file.name} <span className="text-neutral-500">({formatFileSize(file.size)})</span>
               </span>
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                disabled={disabled}
-                className="text-neutral-500 hover:text-error-600 ml-2 shrink-0"
-                aria-label={`Remove ${file.name}`}
-              >
-                Remove
-              </button>
+              <span className="flex items-center gap-3 shrink-0 ml-2">
+                {/* Replace only makes sense for single-file fields — for
+                    multiple, the always-visible dropzone above already
+                    covers adding more files */}
+                {!multiple && (
+                  <button
+                    type="button"
+                    onClick={openFileDialog}
+                    disabled={disabled}
+                    className="text-brand-600 hover:text-brand-700 font-medium"
+                  >
+                    Replace
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeFile(index)}
+                  disabled={disabled}
+                  className="text-neutral-500 hover:text-error-600"
+                  aria-label={`Remove ${file.name}`}
+                >
+                  Remove
+                </button>
+              </span>
             </li>
           ))}
         </ul>

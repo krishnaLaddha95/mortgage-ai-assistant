@@ -1,7 +1,6 @@
 'use client';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PersonalInfoValues } from '@/lib/validations/personalInfoSchema';
 import useFormWizard from '@/lib/form/useFormWizard';
 import Stepper from '@/components/form/stepper/Stepper';
 import Button from '@/components/ui/button/button';
@@ -13,6 +12,8 @@ import {
   MortgageFormValues,
 } from '@/lib/validations/mortgageFormSchema';
 import PropertyDetailsPage from '@/components/form/pages/propertyDetailsPage';
+import ExistingDebtPage from '@/components/form/pages/ExistingDebtPage';
+import DocumentUploadPage from '@/components/form/pages/documentUploadPage';
 
 export default function MortgageApplicationPage() {
   const methods = useForm<MortgageFormValues>({
@@ -24,9 +25,10 @@ export default function MortgageApplicationPage() {
     'Employment & Income',
     'Co-Applicant Information',
     'Property Details',
-    'Loan Details',
+    'Existing Loan Details & Liabilities',
+    'Document Upload',
     'Review & Submit',
-    'Confirmation',
+    
   ];
 
   const applicationType = methods.watch('applicationType');
@@ -54,8 +56,8 @@ export default function MortgageApplicationPage() {
           'employmentStartDate',
         ],
         ['coApplicantName', 'coApplicantEmail', 'relationshipToPrimary'],
-        [],
-        [],
+        ['debts'],
+        ['idProof', 'salaryOrTradeLicence', 'bankStatements', 'propertyDocuments'],
         [],
         [],
       ],
@@ -63,7 +65,7 @@ export default function MortgageApplicationPage() {
       skipStep: (index) => index === 2 && applicationType !== 'joint',
     });
 
-  const onSubmit = (data: PersonalInfoValues) => {
+  const onSubmit = (data: MortgageFormValues) => {
     console.log('Submitted:', data);
   };
 
@@ -71,7 +73,9 @@ export default function MortgageApplicationPage() {
     <FormProvider {...methods}>
       {/* one flat background for the whole page — no separate card color */}
       <div className="min-h-screen bg-paper relative">
+         {/* <div className='bg-neutral-300 m-6  rounded-lg'> */}
         <div className="max-w-[720px] mx-auto py-12 px-8">
+         
           <Stepper currentStep={currentStep} totalSteps={7} />
 
           <h2 className="font-display text-xl text-ink mt-6">
@@ -83,6 +87,8 @@ export default function MortgageApplicationPage() {
             {currentStep === 1 && <EmploymentPage />}
             {currentStep === 2 && <CoApplicantPage />}
             {currentStep === 3 && <PropertyDetailsPage />}
+            {currentStep === 4 && <ExistingDebtPage />}
+            {currentStep === 5 && <DocumentUploadPage />}
           </div>
 
           <div className="flex gap-3 mt-8">
@@ -109,6 +115,7 @@ export default function MortgageApplicationPage() {
         >
           AI
         </button>
+        {/* </div> */}
       </div>
     </FormProvider>
   );
