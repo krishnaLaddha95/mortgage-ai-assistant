@@ -19,6 +19,10 @@ function Template(args: React.ComponentProps<typeof FileUpload>) {
   return <FileUpload {...args} value={files} onChange={setFiles} />;
 }
 
+function makeMockFile(name: string, sizeInBytes = 500000) {
+  return new File(['x'.repeat(sizeInBytes)], name, { type: 'application/pdf' });
+}
+
 export const Default: Story = {
   render: (args) => <Template {...args} />,
   args: { label: 'Upload ID proof' },
@@ -37,12 +41,24 @@ export const WithHelperText: Story = {
   },
 };
 
-export const MultipleFiles: Story = {
+// Single-file field WITH a file already attached — dropzone should be hidden,
+// only the file row with Replace/Remove shows
+export const SingleFileAttached: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    label: 'ID proof',
+    value: [makeMockFile('passport.pdf')],
+  },
+};
+
+// Multi-file field — dropzone stays visible even with files already attached
+export const MultipleFilesWithDropzoneVisible: Story = {
   render: (args) => <Template {...args} />,
   args: {
     label: 'Bank statements',
     multiple: true,
     helperText: 'Last 6 months, one file per month',
+    value: [makeMockFile('january.pdf'), makeMockFile('february.pdf')],
   },
 };
 
