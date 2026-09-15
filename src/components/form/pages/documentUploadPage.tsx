@@ -5,12 +5,12 @@ import { MortgageFormValues } from '@/lib/validations/mortgageFormSchema';
 function DocumentsPage() {
   const { control, watch } = useFormContext<MortgageFormValues>();
 
-  const employmentStatus = watch('employmentStatus');
+  const employmentStatus = watch('employment.employmentStatus');
 
   return (
     <div className="flex flex-col gap-4">
       <Controller
-        name="idProof"
+        name="documents.idProof"
         control={control}
         render={({ field, fieldState }) => (
           <FileUpload
@@ -24,7 +24,7 @@ function DocumentsPage() {
       />
 
       <Controller
-        name="salaryOrTradeLicence"
+        name="documents.salaryOrTradeLicence"
         control={control}
         render={({ field, fieldState }) => (
           <FileUpload
@@ -47,7 +47,7 @@ function DocumentsPage() {
       />
 
       <Controller
-        name="bankStatements"
+        name="documents.bankStatements"
         control={control}
         render={({ field, fieldState }) => (
           <FileUpload
@@ -63,7 +63,7 @@ function DocumentsPage() {
       />
 
       <Controller
-        name="propertyDocuments"
+        name="documents.propertyDocuments"
         control={control}
         render={({ field, fieldState }) => (
           <FileUpload

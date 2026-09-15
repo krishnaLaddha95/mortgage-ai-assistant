@@ -25,15 +25,15 @@ function PropertyDetailsPage() {
     control,
     formState: { errors },
   } = useFormContext<MortgageFormValues>();
-  const purchasePrice = Number(watch('purchasePrice')) || 0;
-  const downPayment = Number(watch('downPayment')) || 0;
+  const purchasePrice = Number(watch('property.purchasePrice')) || 0;
+  const downPayment = Number(watch('property.downPayment')) || 0;
   const ltv = calculateLTV(purchasePrice, downPayment);
   const hasValidInputs = purchasePrice > 0 && downPayment >= 0;
 
   return (
     <div className="flex flex-col gap-4">
       <Controller
-        name="propertyType"
+        name="property.propertyType"
         control={control}
         render={({ field, fieldState }) => (
           <Select
@@ -51,22 +51,22 @@ function PropertyDetailsPage() {
       <Input
         label="Location"
         required
-        error={errors.location?.message}
-        {...register('location')}
+        error={errors.property?.location?.message}
+        {...register('property.location')}
       />
       <Input
         label="Purchase Price (AED)"
         required
         type="number"
-        error={errors.purchasePrice?.message}
-        {...register('purchasePrice')}
+        error={errors.property?.purchasePrice?.message}
+        {...register('property.purchasePrice')}
       />
       <Input
         label="Down Payment (AED)"
         required
         type="number"
-        error={errors.downPayment?.message}
-        {...register('downPayment')}
+        error={errors.property?.downPayment?.message}
+        {...register('property.downPayment')}
       />
       {hasValidInputs && (
         <div className="flex flex-col gap-2">

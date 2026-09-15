@@ -50,35 +50,38 @@ const documentsSchema = z.object({
   propertyDocuments: z.array(z.any()).optional(),
 });
 
-export const mortgageFormSchema = personalInfoSchema
-  .extend(employmentInfoSchema.shape)
-  .extend(coApplicantSchema.shape)
-  .extend(propertySchema.shape)
-  .extend(debtsSchema.shape)
-  .extend(documentsSchema.shape)
+export const mortgageFormSchema = z
+  .object({
+    personalInfo: personalInfoSchema,
+    employment: employmentInfoSchema,
+    coApplicant: coApplicantSchema,
+    property: propertySchema,
+    debts: z.array(debtSchema).optional(),
+    documents: documentsSchema,
+  })
   .superRefine((data, ctx) => {
-    if (data.employmentStatus === 'employed') {
-      if (!data.employerName)
+    if (data.employment.employmentStatus === 'employed') {
+      if (!data.employment.employerName)
         ctx.addIssue({
           code: 'custom',
           message: 'Employer name is required',
           path: ['employerName'],
         });
-      if (!data.jobTitle)
+      if (!data.employment.jobTitle)
         ctx.addIssue({
           code: 'custom',
           message: 'Job title is required',
           path: ['jobTitle'],
         });
     }
-    if (data.employmentStatus === 'self-employed') {
-      if (!data.businessName)
+    if (data.employment.employmentStatus === 'self-employed') {
+      if (!data.employment.businessName)
         ctx.addIssue({
           code: 'custom',
           message: 'Business name is required',
           path: ['businessName'],
         });
-      if (!data.yearsInOperation)
+      if (!data.employment.yearsInOperation)
         ctx.addIssue({
           code: 'custom',
           message: 'Years in operation is required',
@@ -86,41 +89,41 @@ export const mortgageFormSchema = personalInfoSchema
         });
     }
 
-    if (data.applicationType === 'joint') {
-      if (!data.coApplicantName) {
+    if (data.personalInfo.applicationType === 'joint') {
+      if (!data.coApplicant.coApplicantName) {
         ctx.addIssue({
           code: 'custom',
           message: 'Co-applicant name is required',
           path: ['coApplicantName'],
         });
       }
-      if (!data.coApplicantEmail) {
+      if (!data.coApplicant.coApplicantEmail) {
         ctx.addIssue({
           code: 'custom',
           message: 'Co-applicant email is required',
           path: ['coApplicantEmail'],
         });
-      } else if (!/^\S+@\S+\.\S+$/.test(data.coApplicantEmail)) {
+      } else if (!/^\S+@\S+\.\S+$/.test(data.coApplicant.coApplicantEmail)) {
         ctx.addIssue({
           code: 'custom',
           message: 'Please enter a valid email address',
           path: ['coApplicantEmail'],
         });
-      } else if (data.coApplicantEmail === data.email) {
+      } else if (data.coApplicant.coApplicantEmail === data.personalInfo.email) {
         ctx.addIssue({
           code: 'custom',
           message: 'Co-applicant email must be different from your own',
           path: ['coApplicantEmail'],
         });
       }
-      if (!data.relationshipToPrimary) {
+      if (!data.coApplicant.relationshipToPrimary) {
         ctx.addIssue({
           code: 'custom',
           message: 'Please select the relationship to the applicant',
           path: ['relationshipToPrimary'],
         });
       }
-      if (Number(data.downPayment) >= Number(data.purchasePrice)) {
+      if (Number(data.property.downPayment) >= Number(data.property.purchasePrice)) {
         ctx.addIssue({
           code: 'custom',
           message: 'Down payment must be less than the purchase price',

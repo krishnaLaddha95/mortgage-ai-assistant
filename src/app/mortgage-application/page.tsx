@@ -14,6 +14,7 @@ import {
 import PropertyDetailsPage from '@/components/form/pages/propertyDetailsPage';
 import ExistingDebtPage from '@/components/form/pages/ExistingDebtPage';
 import DocumentUploadPage from '@/components/form/pages/documentUploadPage';
+import ReviewPage from '@/components/form/pages/reviewPage';
 
 export default function MortgageApplicationPage() {
   const methods = useForm<MortgageFormValues>({
@@ -31,35 +32,19 @@ export default function MortgageApplicationPage() {
     
   ];
 
-  const applicationType = methods.watch('applicationType');
+  const applicationType = methods.watch('personalInfo.applicationType');
 
   const { currentStep, next, back, isFirstStep } =
     useFormWizard<MortgageFormValues>({
       totalSteps: 7,
       stepFields: [
-        [
-          'applicationType',
-          'fullName',
-          'dateOfBirth',
-          'nationality',
-          'passportNumber',
-          'email',
-          'phone',
-        ],
-        [
-          'employmentStatus',
-          'employerName',
-          'jobTitle',
-          'businessName',
-          'yearsInOperation',
-          'monthlyIncome',
-          'employmentStartDate',
-        ],
-        ['coApplicantName', 'coApplicantEmail', 'relationshipToPrimary'],
-        ['debts'],
-        ['idProof', 'salaryOrTradeLicence', 'bankStatements', 'propertyDocuments'],
-        [],
-        [],
+        ['personalInfo.applicationType', 'personalInfo.fullName', 'personalInfo.dateOfBirth', 'personalInfo.nationality', 'personalInfo.passportNumber', 'personalInfo.email', 'personalInfo.phone'],
+  ['employment.employmentStatus', 'employment.employerName', 'employment.jobTitle', 'employment.businessName', 'employment.yearsInOperation', 'employment.monthlyIncome', 'employment.employmentStartDate'],
+  ['coApplicant.coApplicantName', 'coApplicant.coApplicantEmail', 'coApplicant.relationshipToPrimary'],
+  ['property.propertyType', 'property.location', 'property.purchasePrice', 'property.downPayment'],
+  ['debts'],
+  ['documents.idProof', 'documents.salaryOrTradeLicence', 'documents.bankStatements', 'documents.propertyDocuments'],
+  [],
       ],
       trigger: methods.trigger,
       skipStep: (index) => index === 2 && applicationType !== 'joint',
@@ -68,6 +53,10 @@ export default function MortgageApplicationPage() {
   const onSubmit = (data: MortgageFormValues) => {
     console.log('Submitted:', data);
   };
+
+  function goToStep(index: number): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <FormProvider {...methods}>
@@ -89,6 +78,7 @@ export default function MortgageApplicationPage() {
             {currentStep === 3 && <PropertyDetailsPage />}
             {currentStep === 4 && <ExistingDebtPage />}
             {currentStep === 5 && <DocumentUploadPage />}
+            {currentStep === 6 && <ReviewPage goToStep={goToStep} />}
           </div>
 
           <div className="flex gap-3 mt-8">
