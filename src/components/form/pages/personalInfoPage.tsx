@@ -22,7 +22,7 @@ function PersonalInfoPage() {
   return (
     <div className="flex flex-col gap-4">
       <Controller
-        name="applicationType"
+        name="personalInfo.applicationType"
         control={control}
         render={({ field, fieldState }) => (
           <RadioGroup
@@ -51,19 +51,19 @@ function PersonalInfoPage() {
       <Input
         label="Full name"
         required
-        error={errors.fullName?.message}
-        {...register('fullName')}
+        error={errors.personalInfo?.fullName?.message}
+        {...register('personalInfo.fullName')}
       />
 
       <DatePicker
         label="Date of birth"
         required
-        error={errors.dateOfBirth?.message}
-        {...register('dateOfBirth')}
+        error={errors.personalInfo?.dateOfBirth?.message}
+        {...register('personalInfo.dateOfBirth')}
       />
 
       <Controller
-        name="nationality"
+        name="personalInfo.nationality"
         control={control}
         render={({ field, fieldState }) => (
           <Select
@@ -81,24 +81,24 @@ function PersonalInfoPage() {
       <Input
         label="Passport or ID number"
         required
-        error={errors.passportNumber?.message}
-        {...register('passportNumber')}
+        error={errors.personalInfo?.passportNumber?.message}
+        {...register('personalInfo.passportNumber')}
       />
 
       <Input
         label="Email"
         type="email"
         required
-        error={errors.email?.message}
-        {...register('email')}
+        error={errors.personalInfo?.email?.message}
+        {...register('personalInfo.email')}
       />
 
       <Input
         label="Phone number"
         type="tel"
         required
-        error={errors.phone?.message}
-        {...register('phone')}
+        error={errors.personalInfo?.phone?.message}
+        {...register('personalInfo.phone')}
       />
     </div>
   );

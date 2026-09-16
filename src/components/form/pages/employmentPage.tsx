@@ -17,12 +17,12 @@ function EmploymentPage() {
     formState: { errors },
   } = useFormContext<MortgageFormValues>();
 
-  const employmentStatus = watch('employmentStatus');
+  const employmentStatus = watch('employment.employmentStatus');
 
   return (
     <div className="flex flex-col gap-4">
       <Controller
-        name="employmentStatus"
+        name="employment.employmentStatus"
         control={control}
         render={({ field, fieldState }) => (
           <RadioGroup
@@ -42,14 +42,14 @@ function EmploymentPage() {
           <Input
             label="Employer Name"
             required
-            error={errors.employerName?.message}
-            {...register('employerName')}
+            error={errors.employment?.employerName?.message}
+            {...register('employment.employerName')}
           />
           <Input
             label="Job Title"
             required
-            error={errors.jobTitle?.message}
-            {...register('jobTitle')}
+            error={errors.employment?.jobTitle?.message}
+            {...register('employment.jobTitle')}
           />
         </>
       )}
@@ -59,16 +59,16 @@ function EmploymentPage() {
           <Input
             label="Bussiness name"
             required
-            error={errors.businessName?.message}
-            {...register('businessName')}
+            error={errors.employment?.businessName?.message}
+            {...register('employment.businessName')}
           />
 
           <Input
             label="Years in operation"
             type="number"
             required
-            error={errors.yearsInOperation?.message}
-            {...register('yearsInOperation')}
+            error={errors.employment?.yearsInOperation?.message}
+            {...register('employment.yearsInOperation')}
           />
         </>
       )}
@@ -77,16 +77,16 @@ function EmploymentPage() {
         label="Monthly income (AED)"
         type="number"
         required
-        error={errors.monthlyIncome?.message}
-        {...register('monthlyIncome')}
+        error={errors.employment?.monthlyIncome?.message}
+        {...register('employment.monthlyIncome')}
       />
 
       <DatePicker
         label="Employment start date"
         max={new Date().toISOString().split('T')[0]}
         required
-        error={errors.employmentStartDate?.message}
-        {...register('employmentStartDate')}
+        error={errors.employment?.employmentStartDate?.message}
+        {...register('employment.employmentStartDate')}
       />
     </div>
   );

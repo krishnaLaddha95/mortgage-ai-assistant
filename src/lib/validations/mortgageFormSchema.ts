@@ -44,17 +44,17 @@ const debtsSchema = z.object({
 });
 
 const documentsSchema = z.object({
-  idProof: z.array(z.any()).optional(),
-  salaryOrTradeLicence: z.array(z.any()).optional(),
-  bankStatements: z.array(z.any()).optional(),
-  propertyDocuments: z.array(z.any()).optional(),
+  idProof: z.array(z.any()).min(1, 'ID proof is required'),
+  salaryOrTradeLicence: z.array(z.any()).min(1, 'This document is required'),
+  bankStatements: z.array(z.any()).min(1, 'At least one bank statement is required'),
+  propertyDocuments: z.array(z.any()).min(1, 'Property documents are required'),
 });
 
 export const mortgageFormSchema = z
   .object({
     personalInfo: personalInfoSchema,
     employment: employmentInfoSchema,
-    coApplicant: coApplicantSchema,
+    coApplicant: coApplicantSchema.optional(),
     property: propertySchema,
     debts: z.array(debtSchema).optional(),
     documents: documentsSchema,
@@ -89,7 +89,7 @@ export const mortgageFormSchema = z
         });
     }
 
-    if (data.personalInfo.applicationType === 'joint') {
+    if (data.personalInfo.applicationType === 'joint' && data.coApplicant) {
       if (!data.coApplicant.coApplicantName) {
         ctx.addIssue({
           code: 'custom',

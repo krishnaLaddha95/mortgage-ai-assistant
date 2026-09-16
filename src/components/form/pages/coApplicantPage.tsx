@@ -1,6 +1,6 @@
 import Input from '@/components/ui/input/Input';
 import Select from '@/components/ui/select/select';
-import { CoApplicantValues } from '@/lib/validations/coApplicantSchema';
+import { MortgageFormValues } from '@/lib/validations/mortgageFormSchema';
 import { Controller, useFormContext } from 'react-hook-form';
 
 function CoApplicantPage() {
@@ -8,7 +8,7 @@ function CoApplicantPage() {
     register,
     control,
     formState: { errors },
-  } = useFormContext<CoApplicantValues>();
+  } = useFormContext<MortgageFormValues>();
 
   const relationshipOptions = [
     { value: 'spouse', label: 'Spouse' },
@@ -23,18 +23,18 @@ function CoApplicantPage() {
       <Input
         label="Co-Applicant Name"
         required
-        error={errors.coApplicantName?.message}
-        {...register('coApplicantName')}
+        error={errors.coApplicant?.coApplicantName?.message}
+        {...register('coApplicant.coApplicantName')}
       />
       <Input
         label="Co-Applicant Email"
         required
-        error={errors.coApplicantEmail?.message}
-        {...register('coApplicantEmail')}
+        error={errors.coApplicant?.coApplicantEmail?.message}
+        {...register('coApplicant.coApplicantEmail')}
       />
 
       <Controller
-        name="relationshipToPrimary"
+        name="coApplicant.relationshipToPrimary"
         control={control}
         render={({ field, fieldState }) => (
           <Select

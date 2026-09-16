@@ -19,39 +19,45 @@ const debtTypeOptions = [
 function ExistingDebtPage() {
   const {
     control,
+    formState: { errors },
   } = useFormContext<MortgageFormValues>();
+
   return (
     <Controller
       name="debts"
       control={control}
-      render={({ field, fieldState }) => (
+      render={({ field }) => (
         <RepeatableFieldList<Debt>
           label="Existing debts"
           items={field.value ?? []}
           onChange={field.onChange}
           createItem={() => ({ type: '', monthlyPayment: '' })}
-          error={fieldState.error?.message}
           addButtonLabel="Add another debt"
-          renderRow={(item, index, updateItem) => (
-            <>
-              <Select
-                label="Debt type"
-                options={debtTypeOptions}
-                placeholder="Select type"
-                value={item.type}
-                onChange={(value) => updateItem({ ...item, type: value })}
-              />
+          renderRow={(item, index, updateItem) => {
+            // errors.debts is an ARRAY, one slot per row — not a single message
+            const rowError = errors.debts?.[index];
 
-              <Input
-                label="Monthly payment (AED)"
-                type="number"
-                value={item.monthlyPayment}
-                onChange={(e) =>
-                  updateItem({ ...item, monthlyPayment: e.target.value })
-                }
-              />
-            </>
-          )}
+            return (
+              <>
+                <Select
+                  label="Debt type"
+                  options={debtTypeOptions}
+                  placeholder="Select type"
+                  value={item.type}
+                  onChange={(value) => updateItem({ ...item, type: value })}
+                  error={rowError?.type?.message}
+                />
+
+                <Input
+                  label="Monthly payment (AED)"
+                  type="number"
+                  value={item.monthlyPayment}
+                  onChange={(e) => updateItem({ ...item, monthlyPayment: e.target.value })}
+                  error={rowError?.monthlyPayment?.message}
+                />
+              </>
+            );
+          }}
         />
       )}
     />
