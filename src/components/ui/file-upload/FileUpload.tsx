@@ -122,10 +122,13 @@ function FileUpload({
             ${disabled ? 'opacity-50 cursor-not-allowed bg-neutral-50' : 'hover:border-brand-400'}
           `}
           aria-invalid={!!displayError}
-          aria-describedby={displayError ? errorId : helperText ? helperId : undefined}
+          aria-describedby={
+            displayError ? errorId : helperText ? helperId : undefined
+          }
         >
           <p className="text-sm text-neutral-600">
-            <span className="text-brand-600 font-medium">Click to upload</span> or drag and drop
+            <span className="text-brand-600 font-medium">Click to upload</span>{' '}
+            or drag and drop
           </p>
           <p className="text-xs text-neutral-500 mt-1">
             {accept.replaceAll('.', '').toUpperCase()} up to {maxSizeMB}MB
@@ -141,7 +144,10 @@ function FileUpload({
               className="flex items-center justify-between text-sm bg-neutral-50 rounded-md px-3 py-2 border border-neutral-300"
             >
               <span className="truncate">
-                {file.name} <span className="text-neutral-500">({formatFileSize(file.size)})</span>
+                {file.name}{' '}
+                <span className="text-neutral-500">
+                  ({formatFileSize(file.size)})
+                </span>
               </span>
               <span className="flex items-center gap-3 shrink-0 ml-2">
                 {/* Replace only makes sense for single-file fields — for

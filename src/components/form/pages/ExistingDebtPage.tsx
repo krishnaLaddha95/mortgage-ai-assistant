@@ -52,7 +52,9 @@ function ExistingDebtPage() {
                   label="Monthly payment (AED)"
                   type="number"
                   value={item.monthlyPayment}
-                  onChange={(e) => updateItem({ ...item, monthlyPayment: e.target.value })}
+                  onChange={(e) =>
+                    updateItem({ ...item, monthlyPayment: e.target.value })
+                  }
                   error={rowError?.monthlyPayment?.message}
                 />
               </>

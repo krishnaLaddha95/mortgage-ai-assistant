@@ -14,33 +14,36 @@ interface ReviewPageProps {
   goToStep: (index: number) => void;
 }
 
- const propertyTypeLabels: Record<string, string> = {
+const propertyTypeLabels: Record<string, string> = {
   apartment: 'Apartment',
   villa: 'Villa',
   townhouse: 'Townhouse',
 };
 
- const debtTypeLabels: Record<string, string> = {
+const debtTypeLabels: Record<string, string> = {
   'car-loan': 'Car loan',
   'credit-card': 'Credit card',
   'personal-loan': 'Personal loan',
   other: 'Other',
 };
 
- const documentLabels: { key: keyof MortgageFormValues['documents']; label: string }[] = [
-    { key: 'idProof', label: 'ID proof' },
-    { key: 'salaryOrTradeLicence', label: 'Salary certificate / Trade licence' },
-    { key: 'bankStatements', label: 'Bank statements' },
-    { key: 'propertyDocuments', label: 'Property documents' },
-  ];
+const documentLabels: {
+  key: keyof MortgageFormValues['documents'];
+  label: string;
+}[] = [
+  { key: 'idProof', label: 'ID proof' },
+  { key: 'salaryOrTradeLicence', label: 'Salary certificate / Trade licence' },
+  { key: 'bankStatements', label: 'Bank statements' },
+  { key: 'propertyDocuments', label: 'Property documents' },
+];
 
- function formatDate(isoDate: string | undefined): string {
+function formatDate(isoDate: string | undefined): string {
   if (!isoDate) return '';
   const [year, month, day] = isoDate.split('-');
   return `${day}/${month}/${year}`;
 }
 
- function formatCurrency(amount: string | undefined): string {
+function formatCurrency(amount: string | undefined): string {
   if (!amount) return '';
   return `AED ${Number(amount).toLocaleString('en-US')}`;
 }
@@ -64,8 +67,16 @@ function ReviewPage({ goToStep }: ReviewPageProps) {
         fields={[
           { label: 'Full name', value: formData.personalInfo?.fullName },
           { label: 'Date of birth', value: formData.personalInfo?.dateOfBirth },
-          { label: 'Nationality', value: nationalityLabels[formData.personalInfo?.nationality] ?? formData.personalInfo?.nationality },
-          { label: 'Passport / ID number', value: formData.personalInfo?.passportNumber },
+          {
+            label: 'Nationality',
+            value:
+              nationalityLabels[formData.personalInfo?.nationality] ??
+              formData.personalInfo?.nationality,
+          },
+          {
+            label: 'Passport / ID number',
+            value: formData.personalInfo?.passportNumber,
+          },
           { label: 'Email', value: formData.personalInfo?.email },
           { label: 'Phone number', value: formData.personalInfo?.phone },
         ]}
@@ -77,16 +88,35 @@ function ReviewPage({ goToStep }: ReviewPageProps) {
           formData.employment.employmentStatus === 'self-employed'
             ? [
                 { label: 'Employment status', value: 'Self-employed' },
-                { label: 'Business name', value: formData.employment?.businessName ?? '' },
-                { label: 'Years in operation', value: formData.employment?.yearsInOperation ?? '' },
-              { label: 'Monthly income', value: (formData.employment?.monthlyIncome) },
-            ]
-          : [
-              { label: 'Employment status', value: 'Employed' },
-              { label: 'Employer', value: formData.employment?.employerName ?? '' },
-              { label: 'Job title', value: formData.employment?.jobTitle ?? '' },
-              { label: 'Monthly income', value: (formData.employment?.monthlyIncome) },
-          ]}
+                {
+                  label: 'Business name',
+                  value: formData.employment?.businessName ?? '',
+                },
+                {
+                  label: 'Years in operation',
+                  value: formData.employment?.yearsInOperation ?? '',
+                },
+                {
+                  label: 'Monthly income',
+                  value: formData.employment?.monthlyIncome,
+                },
+              ]
+            : [
+                { label: 'Employment status', value: 'Employed' },
+                {
+                  label: 'Employer',
+                  value: formData.employment?.employerName ?? '',
+                },
+                {
+                  label: 'Job title',
+                  value: formData.employment?.jobTitle ?? '',
+                },
+                {
+                  label: 'Monthly income',
+                  value: formData.employment?.monthlyIncome,
+                },
+              ]
+        }
       />
 
       {isJoint && (
@@ -94,9 +124,18 @@ function ReviewPage({ goToStep }: ReviewPageProps) {
           title="Co-applicant details"
           onEdit={() => goToStep(2)}
           fields={[
-            { label: 'Co-applicant name', value: formData.coApplicant?.coApplicantName ?? '' },
-            { label: 'Co-applicant email', value: formData.coApplicant?.coApplicantEmail ?? '' },
-            { label: 'Relationship', value: formData.coApplicant?.relationshipToPrimary ?? '' },
+            {
+              label: 'Co-applicant name',
+              value: formData.coApplicant?.coApplicantName ?? '',
+            },
+            {
+              label: 'Co-applicant email',
+              value: formData.coApplicant?.coApplicantEmail ?? '',
+            },
+            {
+              label: 'Relationship',
+              value: formData.coApplicant?.relationshipToPrimary ?? '',
+            },
           ]}
         />
       )}
@@ -107,15 +146,23 @@ function ReviewPage({ goToStep }: ReviewPageProps) {
         fields={[
           {
             label: 'Property type',
-            value: propertyTypeLabels[formData.property?.propertyType ?? ''] ?? formData.property?.propertyType ?? '',
+            value:
+              propertyTypeLabels[formData.property?.propertyType ?? ''] ??
+              formData.property?.propertyType ??
+              '',
           },
           { label: 'Location', value: formData.property?.location ?? '' },
-          { label: 'Purchase price', value: formatCurrency(formData.property?.purchasePrice) },
-          { label: 'Down payment', value: formatCurrency(formData.property?.downPayment) },
+          {
+            label: 'Purchase price',
+            value: formatCurrency(formData.property?.purchasePrice),
+          },
+          {
+            label: 'Down payment',
+            value: formatCurrency(formData.property?.downPayment),
+          },
         ]}
       />
 
-     
       <ReviewSectionCard title="Existing debts" onEdit={() => goToStep(4)}>
         {formData.debts && formData.debts.length > 0 ? (
           formData.debts.map((debt, index) => (
@@ -140,15 +187,13 @@ function ReviewPage({ goToStep }: ReviewPageProps) {
                 {count === 0
                   ? 'Not uploaded'
                   : count === 1
-                  ? 'Uploaded'
-                  : `${count} files uploaded`}
+                    ? 'Uploaded'
+                    : `${count} files uploaded`}
               </span>
             </div>
           );
         })}
       </ReviewSectionCard>
-
-     
     </div>
   );
 }

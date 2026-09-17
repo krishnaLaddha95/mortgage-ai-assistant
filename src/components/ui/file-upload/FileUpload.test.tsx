@@ -8,9 +8,19 @@ function makeFile(name: string, sizeInBytes: number, type = 'application/pdf') {
   return new File(['a'.repeat(sizeInBytes)], name, { type });
 }
 
-function ControlledFileUpload({ value: initialValue, ...rest }: Partial<React.ComponentProps<typeof FileUpload>>) {
+function ControlledFileUpload({
+  value: initialValue,
+  ...rest
+}: Partial<React.ComponentProps<typeof FileUpload>>) {
   const [files, setFiles] = useState<File[]>(initialValue ?? []);
-  return <FileUpload label="Upload ID proof" {...rest} value={files} onChange={setFiles} />;
+  return (
+    <FileUpload
+      label="Upload ID proof"
+      {...rest}
+      value={files}
+      onChange={setFiles}
+    />
+  );
 }
 
 test('renders label and upload prompt when empty', () => {
@@ -22,7 +32,9 @@ test('renders label and upload prompt when empty', () => {
 test('adds a file via the hidden input', async () => {
   render(<ControlledFileUpload />);
   const file = makeFile('passport.pdf', 1000);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
 
   await userEvent.upload(input, file);
 
@@ -32,7 +44,9 @@ test('adds a file via the hidden input', async () => {
 test('hides the dropzone once a single file is attached', async () => {
   render(<ControlledFileUpload />);
   const file = makeFile('passport.pdf', 1000);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
 
   await userEvent.upload(input, file);
 
@@ -41,7 +55,9 @@ test('hides the dropzone once a single file is attached', async () => {
 
 test('shows a Replace button for single-file fields once a file exists', async () => {
   render(<ControlledFileUpload />);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
   await userEvent.upload(input, makeFile('passport.pdf', 1000));
 
   expect(screen.getByRole('button', { name: 'Replace' })).toBeInTheDocument();
@@ -49,15 +65,21 @@ test('shows a Replace button for single-file fields once a file exists', async (
 
 test('does not show a Replace button for multi-file fields', async () => {
   render(<ControlledFileUpload multiple />);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
   await userEvent.upload(input, makeFile('jan.pdf', 1000));
 
-  expect(screen.queryByRole('button', { name: 'Replace' })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: 'Replace' })
+  ).not.toBeInTheDocument();
 });
 
 test('keeps the dropzone visible for multi-file fields even with files attached', async () => {
   render(<ControlledFileUpload multiple />);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
   await userEvent.upload(input, makeFile('jan.pdf', 1000));
 
   expect(screen.getByText(/Click to upload/)).toBeInTheDocument();
@@ -67,34 +89,46 @@ test('keeps the dropzone visible for multi-file fields even with files attached'
 test('removes a file when Remove is clicked', async () => {
   render(<ControlledFileUpload />);
   const file = makeFile('passport.pdf', 1000);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
 
   await userEvent.upload(input, file);
   expect(screen.getByText(/passport\.pdf/)).toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole('button', { name: /Remove passport.pdf/i }));
+  await userEvent.click(
+    screen.getByRole('button', { name: /Remove passport.pdf/i })
+  );
   expect(screen.queryByText(/passport\.pdf/)).not.toBeInTheDocument();
 });
 
 test('dropzone reappears for a single-file field after its file is removed', async () => {
   render(<ControlledFileUpload />);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
   await userEvent.upload(input, makeFile('passport.pdf', 1000));
   expect(screen.queryByText(/Click to upload/)).not.toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole('button', { name: /Remove passport.pdf/i }));
+  await userEvent.click(
+    screen.getByRole('button', { name: /Remove passport.pdf/i })
+  );
   expect(screen.getByText(/Click to upload/)).toBeInTheDocument();
 });
 
 test('shows an error when file exceeds max size', async () => {
   render(<ControlledFileUpload maxSizeMB={1} />);
   const bigFile = makeFile('large.pdf', 2 * 1024 * 1024);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
 
   await userEvent.upload(input, bigFile);
 
   expect(screen.getByRole('alert')).toHaveTextContent(/exceeds the 1MB limit/);
-  expect(screen.queryByRole('button', { name: /Remove large.pdf/i })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: /Remove large.pdf/i })
+  ).not.toBeInTheDocument();
 });
 
 test('shows required asterisk', () => {
@@ -115,7 +149,9 @@ test('does not open file dialog when disabled and no file exists', () => {
 
 test('supports multiple files when multiple is true', async () => {
   render(<ControlledFileUpload multiple />);
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
 
   await userEvent.upload(input, makeFile('doc1.pdf', 500));
   await userEvent.upload(input, makeFile('doc2.pdf', 500));

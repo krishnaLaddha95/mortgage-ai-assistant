@@ -2,7 +2,10 @@
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { mortgageFormSchema, MortgageFormValues } from '@/lib/validations/mortgageFormSchema';
+import {
+  mortgageFormSchema,
+  MortgageFormValues,
+} from '@/lib/validations/mortgageFormSchema';
 import useFormWizard from '@/lib/form/useFormWizard';
 import Stepper from '@/components/form/stepper/Stepper';
 import Button from '@/components/ui/button/button';
@@ -14,6 +17,7 @@ import ExistingDebtPage from '@/components/form/pages/ExistingDebtPage';
 import ReviewPage from '@/components/form/pages/reviewPage';
 import SubmitSuccessPage from '@/components/form/pages/submitSuccessPage';
 import DocumentsPage from '@/components/form/pages/documentUploadPage';
+import ChatPanel from '@/components/chat/chat-panel/chatPanel';
 
 const pageTitles = [
   'Personal Information',
@@ -35,20 +39,51 @@ export default function MortgageApplicationPage() {
 
   const applicationType = methods.watch('personalInfo.applicationType');
 
-  const { currentStep, next, back, isFirstStep, goToStep } = useFormWizard<MortgageFormValues>({
-    totalSteps: 7,
-    stepFields: [
-      ['personalInfo.applicationType', 'personalInfo.fullName', 'personalInfo.dateOfBirth', 'personalInfo.nationality', 'personalInfo.passportNumber', 'personalInfo.email', 'personalInfo.phone'],
-      ['employment.employmentStatus', 'employment.employerName', 'employment.jobTitle', 'employment.businessName', 'employment.yearsInOperation', 'employment.monthlyIncome', 'employment.employmentStartDate'],
-      ['coApplicant.coApplicantName', 'coApplicant.coApplicantEmail', 'coApplicant.relationshipToPrimary'],
-      ['property.propertyType', 'property.location', 'property.purchasePrice', 'property.downPayment'],
-      ['debts'],
-      ['documents.idProof', 'documents.salaryOrTradeLicence', 'documents.bankStatements', 'documents.propertyDocuments'],
-      [],
-    ],
-    trigger: methods.trigger,
-    skipStep: (index) => index === 2 && applicationType !== 'joint',
-  });
+  const { currentStep, next, back, isFirstStep, goToStep } =
+    useFormWizard<MortgageFormValues>({
+      totalSteps: 7,
+      stepFields: [
+        [
+          'personalInfo.applicationType',
+          'personalInfo.fullName',
+          'personalInfo.dateOfBirth',
+          'personalInfo.nationality',
+          'personalInfo.passportNumber',
+          'personalInfo.email',
+          'personalInfo.phone',
+        ],
+        [
+          'employment.employmentStatus',
+          'employment.employerName',
+          'employment.jobTitle',
+          'employment.businessName',
+          'employment.yearsInOperation',
+          'employment.monthlyIncome',
+          'employment.employmentStartDate',
+        ],
+        [
+          'coApplicant.coApplicantName',
+          'coApplicant.coApplicantEmail',
+          'coApplicant.relationshipToPrimary',
+        ],
+        [
+          'property.propertyType',
+          'property.location',
+          'property.purchasePrice',
+          'property.downPayment',
+        ],
+        ['debts'],
+        [
+          'documents.idProof',
+          'documents.salaryOrTradeLicence',
+          'documents.bankStatements',
+          'documents.propertyDocuments',
+        ],
+        [],
+      ],
+      trigger: methods.trigger,
+      skipStep: (index) => index === 2 && applicationType !== 'joint',
+    });
 
   const onSubmit = (data: MortgageFormValues) => {
     console.log('Submitted:', data);
@@ -56,8 +91,8 @@ export default function MortgageApplicationPage() {
   };
 
   const onError = (errors: any) => {
-  console.log('Validation failed:', errors);
-};
+    console.log('Validation failed:', errors);
+  };
 
   return (
     <FormProvider {...methods}>
@@ -97,7 +132,11 @@ export default function MortgageApplicationPage() {
               )}
               <Button
                 type="button"
-                onClick={currentStep === 6 ? methods.handleSubmit(onSubmit, onError) : next}
+                onClick={
+                  currentStep === 6
+                    ? methods.handleSubmit(onSubmit, onError)
+                    : next
+                }
               >
                 {currentStep === 6 ? 'Submit application' : 'Next'}
               </Button>
@@ -106,13 +145,7 @@ export default function MortgageApplicationPage() {
         </div>
 
         {!isSubmitted && (
-          <button
-            type="button"
-            className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-brand-600 text-white font-bold shadow-lg"
-            aria-label="Open AI assistant"
-          >
-            AI
-          </button>
+          <ChatPanel currentStep={currentStep} formData={methods.watch()} />
         )}
       </div>
     </FormProvider>

@@ -4,7 +4,13 @@ import '@testing-library/jest-dom';
 import ReviewSectionCard from './ReviewSectionCard';
 
 test('renders the section title', () => {
-  render(<ReviewSectionCard title="Personal information" onEdit={() => {}} fields={[]} />);
+  render(
+    <ReviewSectionCard
+      title="Personal information"
+      onEdit={() => {}}
+      fields={[]}
+    />
+  );
   expect(screen.getByText('Personal information')).toBeInTheDocument();
 });
 
@@ -33,7 +39,13 @@ test('shows an em dash for an empty field value', () => {
 
 test('calls onEdit when the Edit button is clicked', async () => {
   const handleEdit = jest.fn();
-  render(<ReviewSectionCard title="Personal information" onEdit={handleEdit} fields={[]} />);
+  render(
+    <ReviewSectionCard
+      title="Personal information"
+      onEdit={handleEdit}
+      fields={[]}
+    />
+  );
   await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
   expect(handleEdit).toHaveBeenCalledTimes(1);
 });

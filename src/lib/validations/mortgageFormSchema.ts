@@ -46,7 +46,9 @@ const debtsSchema = z.object({
 const documentsSchema = z.object({
   idProof: z.array(z.any()).min(1, 'ID proof is required'),
   salaryOrTradeLicence: z.array(z.any()).min(1, 'This document is required'),
-  bankStatements: z.array(z.any()).min(1, 'At least one bank statement is required'),
+  bankStatements: z
+    .array(z.any())
+    .min(1, 'At least one bank statement is required'),
   propertyDocuments: z.array(z.any()).min(1, 'Property documents are required'),
 });
 
@@ -109,7 +111,9 @@ export const mortgageFormSchema = z
           message: 'Please enter a valid email address',
           path: ['coApplicantEmail'],
         });
-      } else if (data.coApplicant.coApplicantEmail === data.personalInfo.email) {
+      } else if (
+        data.coApplicant.coApplicantEmail === data.personalInfo.email
+      ) {
         ctx.addIssue({
           code: 'custom',
           message: 'Co-applicant email must be different from your own',
@@ -123,7 +127,9 @@ export const mortgageFormSchema = z
           path: ['relationshipToPrimary'],
         });
       }
-      if (Number(data.property.downPayment) >= Number(data.property.purchasePrice)) {
+      if (
+        Number(data.property.downPayment) >= Number(data.property.purchasePrice)
+      ) {
         ctx.addIssue({
           code: 'custom',
           message: 'Down payment must be less than the purchase price',

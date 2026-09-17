@@ -5,7 +5,7 @@ interface UseFormWizardProps<T extends FieldValues> {
   totalSteps: number;
   stepFields: Path<T>[][];
   trigger: UseFormTrigger<T>;
-  skipStep?: (stepIndex: number) => boolean; // NEW: return true to skip a given step
+  skipStep?: (stepIndex: number) => boolean;
 }
 
 function useFormWizard<T extends FieldValues>({
