@@ -17,7 +17,7 @@ interface InputProps extends Omit<
 }
 
 const sizeStyles: Record<InputSize, string> = {
-  md: 'px-3 py-2 text-sm',
+  md: 'px-3 py-2 text-base sm:text-sm',
   lg: 'px-4 py-3 text-base',
 };
 

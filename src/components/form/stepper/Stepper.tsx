@@ -5,8 +5,26 @@ interface StepperProps {
 }
 
 function Stepper({ currentStep, totalSteps, stepLabels }: StepperProps) {
+   const progressPercent = ((currentStep + 1) / totalSteps) * 100;
+  const currentLabel = stepLabels?.[currentStep];
+
   return (
     <nav aria-label="Form progress">
+       <div className="sm:hidden">
+        <p className="text-sm font-medium text-ink">
+          {`Step ${currentStep + 1} of ${totalSteps}`}
+          {currentLabel ? ` · ${currentLabel}` : ''}
+        </p>
+        <div
+          className="mt-2 h-1.5 w-full rounded-full bg-neutral-300"
+          aria-hidden="true"
+        >
+          <div
+            className="h-full rounded-full bg-brand-600 transition-all"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
       <ol className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, index) => {
           const isComplete = index < currentStep;

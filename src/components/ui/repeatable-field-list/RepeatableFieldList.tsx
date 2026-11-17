@@ -55,25 +55,27 @@ function RepeatableFieldList<T>({
 
       <div className="flex flex-col gap-3">
         {items.map((item, index) => (
-          <div
-            key={index}
-            className="relative rounded-md border border-neutral-300 p-4 flex flex-col gap-3"
-          >
-            {renderRow(item, index, (updated) => updateRow(index, updated))}
+  <div
+    key={index}
+    className="rounded-md border border-neutral-300 p-4 flex flex-col gap-3"
+  >
+    {canRemove && (
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => removeRow(index)}
+          disabled={disabled}
+          className="min-h-11 px-2 text-sm text-neutral-500 hover:text-error-600 sm:min-h-0"
+          aria-label={`Remove row ${index + 1}`}
+        >
+          Remove
+        </button>
+      </div>
+    )}
 
-            {canRemove && (
-              <button
-                type="button"
-                onClick={() => removeRow(index)}
-                disabled={disabled}
-                className="absolute top-3 right-3 text-sm text-neutral-500 hover:text-error-600"
-                aria-label={`Remove row ${index + 1}`}
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        ))}
+    {renderRow(item, index, (updated) => updateRow(index, updated))}
+  </div>
+))}
       </div>
 
       {items.length === 0 && (

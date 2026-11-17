@@ -33,9 +33,9 @@ function ReviewSectionCard({
 
       <div className="bg-white border border-neutral-300 rounded-md p-4">
         {fields ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {fields.map((field) => (
-              <div key={field.label}>
+              <div key={field.label} className="min-w-0">
                 <div className="text-xs text-neutral-500 mb-0.5">
                   {field.label}
                 </div>

@@ -138,7 +138,7 @@ export default function MortgageApplicationPage() {
   return (
     <FormProvider {...methods}>
       <div className="min-h-screen bg-paper relative">
-        <div className="max-w-[720px] mx-auto py-12 px-8">
+        <div className="max-w-[720px] mx-auto pt-8 pb-28 px-4 sm:pt-12 sm:px-8">
           {!isSubmitted && (
             <>
               <Stepper currentStep={currentStep} totalSteps={7} />

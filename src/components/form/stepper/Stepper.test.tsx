@@ -46,3 +46,15 @@ test('renders as a navigation landmark with an accessible name', () => {
     screen.getByRole('navigation', { name: 'Form progress' })
   ).toBeInTheDocument();
 });
+
+test('shows a compact step summary for small screens', () => {
+  render(<Stepper currentStep={2} totalSteps={7} />);
+  expect(screen.getByText('Step 3 of 7')).toBeInTheDocument();
+});
+
+test('includes the current step label in the compact summary', () => {
+  render(
+    <Stepper currentStep={0} totalSteps={3} stepLabels={['Personal', 'Employment', 'Review']} />
+  );
+  expect(screen.getByText('Step 1 of 3 · Personal')).toBeInTheDocument();
+});

@@ -6,10 +6,13 @@ import { getSystemPrompt } from '@/lib/ai/getSystemPrompt';
 import { getChatErrorMessage } from '@/lib/ai/getChatErrorMessage';
 import { MortgageFormValues } from '@/lib/validations/mortgageFormSchema';
 
+const IDLE_TIMEOUT_MS = 20000;
+const MAX_MESSAGE_LENGTH = 500;
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  error?: string; // set when this reply failed
+  error?: string; 
 }
 
 interface ChatPanelProps {
@@ -26,8 +29,6 @@ function ChatPanel({ currentStep, formData }: ChatPanelProps) {
     {}
   );
   const messages = historyByStep[currentStep] ?? [];
-  const IDLE_TIMEOUT_MS = 20000;
-const MAX_MESSAGE_LENGTH = 500;
 
   function setMessagesForCurrentStep(updater: (prev: Message[]) => Message[]) {
     setHistoryByStep((prev) => ({
@@ -61,54 +62,53 @@ const MAX_MESSAGE_LENGTH = 500;
     setIsStreaming(true);
     const systemPrompt = getSystemPrompt(currentStep, formData, question);
 
-   const controller = new AbortController();
-  let timeoutId = setTimeout(() => controller.abort(), IDLE_TIMEOUT_MS);
-  const restartTimeout = () => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => controller.abort(), IDLE_TIMEOUT_MS);
-  };
+    const controller = new AbortController();
+    let timeoutId = setTimeout(() => controller.abort(), IDLE_TIMEOUT_MS);
+    const restartTimeout = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => controller.abort(), IDLE_TIMEOUT_MS);
+    };
 
-  let gotText = false;
+    let gotText = false;
 
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: question, systemPrompt }),
-      signal: controller.signal,
-    });
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: question, systemPrompt }),
+        signal: controller.signal,
+      });
 
-    if (!res.ok || !res.body) {
-      markLastMessageFailed(getChatErrorMessage(res.status));
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      restartTimeout();
-      const text = decoder.decode(value, { stream: true });
-      if (text) {
-        gotText = true;
-        appendToLastMessage(text);
+      if (!res.ok || !res.body) {
+        markLastMessageFailed(getChatErrorMessage(res.status));
+        return;
       }
-    }
 
-   if (!gotText) {
-      markLastMessageFailed(getChatErrorMessage('empty'));
-    }
-  } catch {
-    markLastMessageFailed(
-      getChatErrorMessage(controller.signal.aborted ? 'timeout' : undefined)
-    );
-  } finally {
-    clearTimeout(timeoutId);
-    setIsStreaming(false);
-  }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
 
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        restartTimeout();
+        const text = decoder.decode(value, { stream: true });
+        if (text) {
+          gotText = true;
+          appendToLastMessage(text);
+        }
+      }
+
+      if (!gotText) {
+        markLastMessageFailed(getChatErrorMessage('empty'));
+      }
+    } catch {
+      markLastMessageFailed(
+        getChatErrorMessage(controller.signal.aborted ? 'timeout' : undefined)
+      );
+    } finally {
+      clearTimeout(timeoutId);
+      setIsStreaming(false);
+    }
   }
 
   async function handleSend() {
@@ -143,7 +143,7 @@ const MAX_MESSAGE_LENGTH = 500;
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-brand-600 text-white font-bold shadow-lg"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 rounded-full bg-brand-600 text-white font-bold shadow-lg"
         aria-label="Open AI assistant"
       >
         AI
@@ -152,8 +152,8 @@ const MAX_MESSAGE_LENGTH = 500;
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-paper border border-neutral-300 rounded-lg shadow-xl flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-300">
+    <div className="fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-96 h-[min(500px,calc(100dvh_-_2rem))] bg-paper border border-neutral-300 rounded-lg shadow-xl flex flex-col">
+      <div className="flex items-center justify-between px-4 py-2 sm:py-3 border-b border-neutral-300">
         <h3 className="font-display text-sm font-semibold text-ink">
           AI Assistant
         </h3>
@@ -161,7 +161,7 @@ const MAX_MESSAGE_LENGTH = 500;
           type="button"
           onClick={() => setIsOpen(false)}
           aria-label="Close AI assistant"
-          className="text-neutral-500 hover:text-ink"
+          className="-mr-3 flex h-11 w-11 items-center justify-center text-neutral-500 hover:text-ink sm:mr-0 sm:h-auto sm:w-auto"
         >
           ✕
         </button>
@@ -215,13 +215,13 @@ const MAX_MESSAGE_LENGTH = 500;
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask a question..."
           disabled={isStreaming}
-          className="flex-1 px-3 py-2 text-sm rounded-md border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="flex-1 px-3 py-2 text-base sm:text-sm rounded-md border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <button
           type="button"
           onClick={handleSend}
           disabled={isStreaming}
-          className="px-3 py-2 bg-brand-600 text-white rounded-md text-sm font-medium disabled:opacity-50"
+          className="px-3 py-2 min-h-11 sm:min-h-0 bg-brand-600 text-white rounded-md text-sm font-medium disabled:opacity-50"
         >
           Send
         </button>

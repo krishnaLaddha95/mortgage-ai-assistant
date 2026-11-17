@@ -165,7 +165,7 @@ function Select({
                     setIsOpen(false);
                   }}
                   className={`
-                    px-3 py-2 text-sm cursor-pointer flex items-center justify-between
+                    px-3 py-3 sm:py-2 text-sm cursor-pointer flex items-center justify-between
                     ${isHighlighted ? 'bg-brand-50 text-brand-700' : 'text-ink'}
                     ${isSelected ? 'font-medium' : 'font-normal'}
                   `}
