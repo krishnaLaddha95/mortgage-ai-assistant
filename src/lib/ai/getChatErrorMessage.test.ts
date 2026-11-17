@@ -23,3 +23,7 @@ test('returns a timeout message', () => {
 test('returns an empty-answer message', () => {
   expect(getChatErrorMessage('empty')).toContain("didn't return an answer");
 });
+
+test('returns a busy message for 503', () => {
+  expect(getChatErrorMessage(503)).toContain('busy');
+});
