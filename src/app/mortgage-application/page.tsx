@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   mortgageFormSchema,
@@ -29,12 +29,31 @@ const pageTitles = [
   'Review & Consent',
 ];
 
+const STEP_BY_SECTION: Record<string, number> = {
+  personalInfo: 0,
+  employment: 1,
+  coApplicant: 2,
+  property: 3,
+  debts: 4,
+  documents: 5,
+  consent: 6,
+};
+
 export default function MortgageApplicationPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
 
   const methods = useForm<MortgageFormValues>({
     resolver: zodResolver(mortgageFormSchema),
     mode: 'onBlur',
+    defaultValues: {
+      personalInfo: {
+        applicationType: 'individual',
+      },
+      employment: {
+        employmentStatus: 'employed',
+      },
+    },
   });
 
   const applicationType = methods.watch('personalInfo.applicationType');
@@ -90,8 +109,30 @@ export default function MortgageApplicationPage() {
     setIsSubmitted(true);
   };
 
-  const onError = (errors: any) => {
-    console.log('Validation failed:', errors);
+  const onInvalid = (errors: FieldErrors<MortgageFormValues>) => {
+    const stepsWithErrors = Object.keys(errors)
+      .map((section) => STEP_BY_SECTION[section])
+      .filter((step): step is number => step !== undefined);
+    if (stepsWithErrors.length === 0) return;
+
+    const firstStep = Math.min(...stepsWithErrors);
+    
+    if (firstStep < 6) {
+      setSubmitMessage(
+        'Some answers need fixing before you can submit. We have taken you to the first one.'
+      );
+      goToStep(firstStep);
+    }
+  };
+
+  const handleNext = () => {
+    setSubmitMessage(null);
+    next();
+  };
+
+  const handleBack = () => {
+    setSubmitMessage(null);
+    back();
   };
 
   return (
@@ -104,6 +145,11 @@ export default function MortgageApplicationPage() {
               <h2 className="font-display text-xl text-ink mt-6">
                 {currentStep + 1 + '. ' + pageTitles[currentStep]}
               </h2>
+              {submitMessage && (
+                <p role="alert" className="mt-6 text-sm text-error-600">
+                  {submitMessage}
+                </p>
+              )}
             </>
           )}
 
@@ -126,7 +172,7 @@ export default function MortgageApplicationPage() {
           {!isSubmitted && (
             <div className="flex gap-3 mt-8">
               {!isFirstStep && (
-                <Button type="button" color="secondary" onClick={back}>
+                <Button type="button" color="secondary" onClick={handleBack}>
                   Back
                 </Button>
               )}
@@ -134,8 +180,8 @@ export default function MortgageApplicationPage() {
                 type="button"
                 onClick={
                   currentStep === 6
-                    ? methods.handleSubmit(onSubmit, onError)
-                    : next
+                    ? methods.handleSubmit(onSubmit, onInvalid)
+                    : handleNext
                 }
               >
                 {currentStep === 6 ? 'Submit application' : 'Next'}

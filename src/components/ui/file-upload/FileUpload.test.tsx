@@ -169,3 +169,17 @@ test('handles drag and drop', () => {
 
   expect(screen.getByText(/dropped\.pdf/)).toBeInTheDocument();
 });
+
+test('rejects a dropped file with the wrong type', () => {
+  render(<ControlledFileUpload />);
+  const dropzone = screen.getByRole('button');
+
+  fireEvent.drop(dropzone, {
+    dataTransfer: { files: [makeFile('notes.txt', 500, 'text/plain')] },
+  });
+
+  expect(screen.getByRole('alert')).toHaveTextContent(/not an accepted file type/i);
+  expect(
+    screen.queryByRole('button', { name: /Remove notes.txt/i })
+  ).not.toBeInTheDocument();
+});

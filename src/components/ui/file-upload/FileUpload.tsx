@@ -19,6 +19,12 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function isAcceptedType(file: File, accept: string): boolean {
+  const allowed = accept.split(',').map((ext) => ext.trim().toLowerCase());
+  const name = file.name.toLowerCase();
+  return allowed.some((ext) => name.endsWith(ext));
+}
+
 function FileUpload({
   label,
   accept = '.pdf,.jpg,.jpeg,.png',
@@ -36,26 +42,30 @@ function FileUpload({
   const helperId = `${inputId}-helper`;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [sizeError, setSizeError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
-  // For single-file fields, once a file exists, the dropzone hides in favor
-  // of the file row + a "Replace" action. Multi-file fields always keep the
-  // dropzone visible, since adding more is an expected, repeated action.
   const showDropzone = multiple || value.length === 0;
 
-  const validateAndSetFiles = useCallback(
-    (fileList: FileList) => {
-      const files = Array.from(fileList);
-      const oversized = files.find((f) => f.size > maxSizeMB * 1024 * 1024);
-      if (oversized) {
-        setSizeError(`"${oversized.name}" exceeds the ${maxSizeMB}MB limit`);
-        return;
-      }
-      setSizeError(null);
-      onChange?.(multiple ? [...value, ...files] : files);
-    },
-    [maxSizeMB, multiple, onChange, value]
-  );
+ const validateAndSetFiles = useCallback(
+  (fileList: FileList) => {
+    const files = Array.from(fileList);
+
+    const wrongType = files.find((f) => !isAcceptedType(f, accept));
+    if (wrongType) {
+      setFileError(`"${wrongType.name}" is not an accepted file type`);
+      return;
+    }
+
+    const oversized = files.find((f) => f.size > maxSizeMB * 1024 * 1024);
+    if (oversized) {
+      setFileError(`"${oversized.name}" exceeds the ${maxSizeMB}MB limit`);
+      return;
+    }
+    setFileError(null);
+    onChange?.(multiple ? [...value, ...files] : files);
+  },
+  [accept, maxSizeMB, multiple, onChange, value]
+);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -72,7 +82,7 @@ function FileUpload({
     if (!disabled) inputRef.current?.click();
   };
 
-  const displayError = error || sizeError;
+  const displayError = error || fileError;
 
   return (
     <div className="flex flex-col gap-1">
