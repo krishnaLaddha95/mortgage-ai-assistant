@@ -104,8 +104,7 @@ export default function MortgageApplicationPage() {
       skipStep: (index) => index === 2 && applicationType !== 'joint',
     });
 
-  const onSubmit = (data: MortgageFormValues) => {
-    console.log('Submitted:', data);
+  const onSubmit = () => {
     setIsSubmitted(true);
   };
 

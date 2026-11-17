@@ -51,13 +51,10 @@ function formatCurrency(amount: string | undefined): string {
 function ReviewPage({ goToStep }: ReviewPageProps) {
   const {
     watch,
-    register,
     formState: { errors },
   } = useFormContext<MortgageFormValues>();
   const formData = watch();
   const isJoint = formData.personalInfo?.applicationType === 'joint';
-
-  console.log('Form Data:', formData);
 
   return (
     <div className="flex flex-col gap-8">
