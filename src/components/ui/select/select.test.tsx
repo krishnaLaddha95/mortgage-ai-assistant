@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import Select from './select';
+import { axe } from 'jest-axe';
 
 const options = [
   { value: 'in', label: 'India' },
@@ -97,4 +98,19 @@ test('shows helper text when there is no error', () => {
   expect(
     screen.getByText('This affects required documents')
   ).toBeInTheDocument();
+});
+
+test('has no accessibility violations when closed', async () => {
+  const { container } = render(
+    <Select label="Nationality" options={options} value="" onChange={() => {}} />
+  );
+  expect(await axe(container)).toHaveNoViolations();
+});
+
+test('has no accessibility violations when open', async () => {
+  const { container } = render(
+    <Select label="Nationality" options={options} value="in" onChange={() => {}} />
+  );
+  await userEvent.click(screen.getByRole('button'));
+  expect(await axe(container)).toHaveNoViolations();
 });

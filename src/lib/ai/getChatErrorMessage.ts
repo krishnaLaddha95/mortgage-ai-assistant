@@ -10,7 +10,7 @@ export function getChatErrorMessage(
   if (reason === undefined) {
     return "Couldn't reach the assistant. Check your connection and try again.";
   }
-  if (reason === 429) {
+  if (reason === 429 || reason === 503) {
     return 'The assistant is busy right now. Please wait a minute and try again.';
   }
   return 'Something went wrong with the assistant. Please try again.';

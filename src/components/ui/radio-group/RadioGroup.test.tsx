@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import RadioGroup from './RadioGroup';
+import { axe } from 'jest-axe';
 
 const options = [
   { value: 'employed', label: 'Employed' },
   { value: 'self-employed', label: 'Self-employed' },
 ];
-
 // Controlled wrapper so tests exercise real onChange behavior
 function ControlledRadioGroup(
   props: Partial<React.ComponentProps<typeof RadioGroup>>
@@ -127,4 +127,32 @@ test('does not call onChange when disabled', async () => {
 test.each(['md', 'lg'] as const)('renders %s size without crashing', (size) => {
   render(<ControlledRadioGroup size={size} />);
   expect(screen.getByLabelText('Employed')).toBeInTheDocument();
+});
+
+test('has no accessibility violations', async () => {
+  const { container } = render(
+    <RadioGroup
+      label="Employment status"
+      name="employment"
+      options={options}
+      value="employed"
+      onChange={() => {}}
+    />
+  );
+  expect(await axe(container)).toHaveNoViolations();
+});
+
+test('has no accessibility violations in the error state', async () => {
+  const { container } = render(
+    <RadioGroup
+      label="Employment status"
+      name="employment"
+      options={options}
+      value=""
+      onChange={() => {}}
+      error="Please select your employment status"
+      required
+    />
+  );
+  expect(await axe(container)).toHaveNoViolations();
 });

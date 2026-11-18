@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import '@testing-library/jest-dom';
 import FileUpload from './FileUpload';
+import { axe } from 'jest-axe';
 
 function makeFile(name: string, sizeInBytes: number, type = 'application/pdf') {
   return new File(['a'.repeat(sizeInBytes)], name, { type });
@@ -182,4 +183,16 @@ test('rejects a dropped file with the wrong type', () => {
   expect(
     screen.queryByRole('button', { name: /Remove notes.txt/i })
   ).not.toBeInTheDocument();
+});
+
+test('has no accessibility violations when empty', async () => {
+  const { container } = render(<FileUpload label="ID proof" />);
+  expect(await axe(container)).toHaveNoViolations();
+});
+
+test('has no accessibility violations in the error state', async () => {
+  const { container } = render(
+    <FileUpload label="ID proof" error="This document is required" required />
+  );
+  expect(await axe(container)).toHaveNoViolations();
 });
